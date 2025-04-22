@@ -1,1 +1,1 @@
-web: python3 bot_Nirs.py
+worker: python3 bot_Nirs.py

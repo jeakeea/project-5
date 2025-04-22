@@ -1,0 +1,13 @@
+services:
+  - type: worker
+    name: nirs-telegram-bot
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: python3 bot_Nirs.py
+    envVars:
+      - key: TELEGRAM_BOT_TOKEN
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_KEY
+        sync: false
