@@ -65,13 +65,21 @@ def fetch_advisors(search_query=None):
     try:
         url = f"{SUPABASE_URL}/rest/v1/scientific_advisors"
 
-        # Add search query if provided - now searching by last_name
+        # Add search query if provided
         if search_query:
-            url += f"?last_name=ilike.%{search_query}%"
+            url += f"?research_field=ilike.%{search_query}%"
+
+        logger.info(f"Fetching advisors from URL: {url}")
+        logger.info(f"Using SUPABASE_URL: {SUPABASE_URL}")
+        logger.info(f"Using SUPABASE_KEY: {'set' if SUPABASE_KEY else 'not set'}")
+        logger.info(f"Using headers: {headers}")
 
         response = requests.get(url, headers=headers, timeout=10)
         response.raise_for_status()
-        return response.json()
+
+        advisors = response.json()
+        logger.info(f"Received {len(advisors)} advisors from database")
+        return advisors
     except requests.exceptions.Timeout:
         logger.error("Timeout while fetching advisors from Supabase")
         return None
@@ -479,7 +487,7 @@ def main():
 
         logger.info("Handlers registered successfully")
 
-        # Start the bot with increased timeout
+        # Start the bot with drop_pending_updates=True to avoid duplicate messages
         logger.info("Starting polling...")
         application.run_polling(
             allowed_updates=Update.ALL_TYPES,
