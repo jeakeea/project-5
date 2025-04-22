@@ -11,7 +11,7 @@ from telegram.request import HTTPXRequest
 # Configure logging
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - [%(filename)s:%(lineno)d] - %(message)s',
-    level=logging.DEBUG
+    level=logging.INFO  # Изменено с DEBUG на INFO для production
 )
 
 logger = logging.getLogger(__name__)
@@ -183,14 +183,7 @@ def format_calendar(calendar_data, advisor):
 
 def format_advisor_basic_info(advisor):
     """Format basic advisor information into a message."""
-    name_parts = advisor['last_name'].split()
-    if len(name_parts) >= 3:
-        last_name, first_name, patronymic = name_parts[0], name_parts[1], ' '.join(name_parts[2:])
-    else:
-        last_name = advisor['last_name']
-        first_name = patronymic = ""
-
-    message = f"👤 *{last_name} {first_name} {patronymic}*\n"
+    message = f"👤 *{advisor['last_name']}*\n"
     message += f"📚 Направление: {advisor['research_field']}\n"
     message += f"📧 Email: {advisor['email']}\n"
     message += f"📞 Телефон: {advisor['phone']}\n"
@@ -208,14 +201,7 @@ def format_advisor_basic_info(advisor):
 
 def format_advisor_schedule(advisor):
     """Format advisor schedule information."""
-    name_parts = advisor['last_name'].split()
-    if len(name_parts) >= 3:
-        last_name, first_name, patronymic = name_parts[0], name_parts[1], ' '.join(name_parts[2:])
-    else:
-        last_name = advisor['last_name']
-        first_name = patronymic = ""
-
-    message = f"📅 Расписание научного руководителя *{last_name} {first_name} {patronymic}*:\n\n"
+    message = f"📅 Расписание научного руководителя *{advisor['last_name']}*:\n\n"
     message += format_calendar(advisor.get('calendar', {}), advisor)
     return message
 
@@ -501,6 +487,7 @@ def main():
             read_timeout=30,
             write_timeout=30,
             connect_timeout=30,
+            drop_pending_updates=True  # Добавлено для игнорирования старых обновлений
         )
     except Exception as e:
         logger.error(f"Error starting bot: {str(e)}", exc_info=True)
