@@ -1,7 +1,14 @@
 [build]
 builder = "nixpacks"
-buildCommand = "pip install -r requirements.txt"
+buildCommand = """
+curl -sSL https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+python3 get-pip.py
+pip install -r requirements.txt
+"""
 
 [deploy]
 startCommand = "python3 bot_Nirs.py"
 restartPolicyType = "always"
+
+[deploy.env]
+PYTHONUNBUFFERED = "1"
