@@ -1,1 +1,1 @@
-$ web: python3 bot_Nirs.py
+web: python3 bot_Nirs.py
