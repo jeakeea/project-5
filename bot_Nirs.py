@@ -65,9 +65,9 @@ def fetch_advisors(search_query=None):
     try:
         url = f"{SUPABASE_URL}/rest/v1/scientific_advisors"
 
-        # Add search query if provided
+        # Add search query if provided - searching by last_name
         if search_query:
-            url += f"?research_field=ilike.%{search_query}%"
+            url += f"?last_name=ilike.*{search_query}*"
 
         logger.info(f"Fetching advisors from URL: {url}")
         logger.info(f"Using SUPABASE_URL: {SUPABASE_URL}")
