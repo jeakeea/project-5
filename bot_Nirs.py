@@ -65,9 +65,9 @@ def fetch_advisors(search_query=None):
     try:
         url = f"{SUPABASE_URL}/rest/v1/scientific_advisors"
 
-        # Add search query if provided - searching by last_name
+        # Add search query if provided - search by both last_name and research_field
         if search_query:
-            url += f"?last_name=ilike.*{search_query}*"
+            url += f"?or=(last_name.ilike.*{search_query}*,research_field.ilike.*{search_query}*)"
 
         logger.info(f"Fetching advisors from URL: {url}")
         logger.info(f"Using SUPABASE_URL: {SUPABASE_URL}")
@@ -219,7 +219,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     logger.info(f"Start command received from user {update.effective_user.id}")
     keyboard = [
         [InlineKeyboardButton("📚 Список направлений исследований", callback_data='list_advisors')],
-        [InlineKeyboardButton("🔍 Поиск по фамилии", callback_data='search_field')],
+        [InlineKeyboardButton("🔍 Поиск по фамилии или направлению", callback_data='search_field')],
         [InlineKeyboardButton("ℹ️ Помощь", callback_data='help')]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
@@ -343,7 +343,7 @@ async def show_schedule(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def search_field(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Handle advisor name search."""
+    """Handle advisor search."""
     logger.info(f"Search field request from user {update.effective_user.id}")
     await update.callback_query.answer()
 
@@ -352,7 +352,7 @@ async def search_field(update: Update, context: ContextTypes.DEFAULT_TYPE):
     reply_markup = InlineKeyboardMarkup(keyboard)
 
     await update.callback_query.message.reply_text(
-        "Введите фамилию научного руководителя для поиска:",
+        "Введите фамилию научного руководителя или направление исследований для поиска:",
         reply_markup=reply_markup
     )
     context.user_data['expecting_search'] = True
@@ -380,7 +380,7 @@ async def handle_search(update: Update, context: ContextTypes.DEFAULT_TYPE):
         reply_markup = InlineKeyboardMarkup(keyboard)
 
         await update.message.reply_text(
-            f"Научный руководитель '{search_query}' не найден.",
+            f"По запросу '{search_query}' ничего не найдено.",
             reply_markup=reply_markup
         )
         return
@@ -416,7 +416,7 @@ async def back_to_main(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Handle returning to the main menu."""
     keyboard = [
         [InlineKeyboardButton("📚 Список направлений исследований", callback_data='list_advisors')],
-        [InlineKeyboardButton("🔍 Поиск по фамилии", callback_data='search_field')],
+        [InlineKeyboardButton("🔍 Поиск по фамилии или направлению", callback_data='search_field')],
         [InlineKeyboardButton("ℹ️ Помощь", callback_data='help')]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
@@ -439,7 +439,7 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 Возможности бота:
 • Просмотр списка научных руководителей по направлениям
-• Поиск руководителей по фамилии
+• Поиск руководителей по фамилии или направлению исследований
 • Просмотр информации о лимитах набора студентов
 • Контактные данные руководителей
 • Расписание и календарь встреч
